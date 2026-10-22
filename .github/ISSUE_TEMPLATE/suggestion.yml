@@ -1,6 +1,6 @@
 name: Suggestion
 description: Ask for a new feature or a change.
-labels: [enhancement]
+labels: [suggestion]
 body:
   - type: textarea
     id: problem
