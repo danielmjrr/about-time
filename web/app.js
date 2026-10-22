@@ -82,7 +82,7 @@ function leaveRows(from, to) {
   const off = [...daysOff(db.entries, from, to).values()];
   const hourly = (t) => totals(db.entries.filter((e) => !isWork(e) && !isDayOff(e) && (e.leaveType || "other") === t), from, to).sum;
   return LEAVE_TYPES.filter(([t]) => t !== "holiday")
-    .map(([t, name]) => ({ name, color: DAY_OFF[t]?.color || LEAVE.color, hours: off.filter((x) => x === t).length * hoursPerDay() + hourly(t), leave: true }))
+    .map(([t, name]) => ({ name, color: DAY_OFF[t]?.color || LEAVE.color, hours: off.filter((x) => x === t).length * hoursPerDay() + hourly(t), leave: true, fullDay: FULL_DAY.includes(t) }))
     .filter((r) => r.hours);
 }
 // "21 workdays, 2 sick days, 1 holiday". A holiday is not a workday. Sick and vacation days still are.
@@ -146,6 +146,9 @@ function period(title, sub, from, to, target, noun) {
     ...t.rows.map((r) => ({ name: client(r.clientId).name, color: client(r.clientId).color, hours: r.hours, amt: amount(r) })),
     ...leave,
   ];
+  const tip = (r) => `${esc(r.name)} ${fmtHours(r.hours)}${r.amt ? `, ${r.amt}` : ""}`;
+  // Sick and vacation days show only in the bar and the day count, so the legend stays on one row.
+  const named = legend.filter((r) => !r.fullDay);
   return `<article class="period"><div class="p-in">
     <header class="p-head"><h2>${title}</h2><span class="range">${sub}</span></header>
     <p class="figure"><span class="big">${fmtHours(t.sum)}</span>${target ? `<span class="of">of ${fmtHours(target)}</span>` : ""}</p>
@@ -155,11 +158,11 @@ function period(title, sub, from, to, target, noun) {
       ${remote != null ? stat(`${remote}%`, "remote") : ""}
     </div>
     <div class="strip" role="img" aria-label="${fmtHours(t.sum)} logged${leaveSum ? `, ${fmtHours(leaveSum)} on leave` : ""}${target ? ` of a ${fmtHours(target)} target` : ""}">
-      <div class="fill">${t.rows.map((r) => `<span style="--c:${client(r.clientId).color};width:${(r.hours / scale) * 100}%"></span>`).join("")}${leave.map((r) => `<span class="leave" style="--c:${r.color};width:${(r.hours / scale) * 100}%"></span>`).join("")}</div>
+      <div class="fill">${legend.map((r) => `<span class="${r.leave ? "leave" : ""}" style="--c:${r.color};width:${(r.hours / scale) * 100}%" title="${tip(r)}"></span>`).join("")}</div>
       ${target ? `<span class="tick" style="left:${(target / scale) * 100}%"></span>` : ""}
     </div>
-    ${legend.length
-      ? `<ul class="legend">${legend.map((r) => `<li class="${r.leave ? "leave" : ""}" style="--c:${r.color}">
+    ${named.length
+      ? `<ul class="legend">${named.map((r) => `<li class="${r.leave ? "leave" : ""}" style="--c:${r.color}">
           <span class="dot"></span>${esc(r.name)} <b>${fmtHours(r.hours)}</b>${r.amt ? `<span class="amt">${r.amt}</span>` : ""}</li>`).join("")}
           ${unbilled ? `<li class="extra" title="Extra work you did not bill. Not in the totals.">+${fmtHours(unbilled)} unbilled</li>` : ""}</ul>`
       : `<p class="hint legend">No time logged this ${noun}.</p>`}
