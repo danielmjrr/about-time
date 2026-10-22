@@ -90,13 +90,16 @@ export function durationFromTimes(start, end) {
   return d > 0 ? d / 60 : null;
 }
 
-// Distinct Monday-to-Friday dates with a Holiday leave entry, for from <= date < to.
-export function holidayWorkdays(entries, from, to) {
-  const days = new Set();
+// Leave types that take the whole day. They have no hours.
+export const FULL_DAY = ["sick", "holiday", "vacation"];
+
+// Monday-to-Friday dates with a full-day leave entry, for from <= date < to. Maps date -> leave type.
+export function daysOff(entries, from, to) {
+  const days = new Map();
   for (const e of entries) {
-    if (e.leaveType === "holiday" && e.date >= from && e.date < to && fromIso(e.date).getDay() % 6) days.add(e.date);
+    if (FULL_DAY.includes(e.leaveType) && e.date >= from && e.date < to && fromIso(e.date).getDay() % 6) days.set(e.date, e.leaveType);
   }
-  return days.size;
+  return days;
 }
 
 // Mondays to Fridays of the week that starts on ws and that fall in the month of d.
@@ -115,4 +118,17 @@ export function weekdaysInMonth(d) {
     if (x.getDay() % 6) n++;
   }
   return n;
+}
+
+// "9" -> "09:00", "930" -> "09:30", "9:30" -> "09:30". Null when it is not a time of day.
+export function normalizeTime(text) {
+  const m = String(text).trim().match(/^(\d{1,2})(?:[:.h]?(\d{2}))?$/);
+  if (!m || +m[1] > 23 || +(m[2] || 0) > 59) return null;
+  return `${m[1].padStart(2, "0")}:${m[2] || "00"}`;
+}
+
+// The next quarter hour at or after d, as "HH:MM". Never later than 23:45.
+export function nextQuarter(d) {
+  const q = Math.min(Math.ceil((d.getHours() * 60 + d.getMinutes()) / 15), 95);
+  return `${String(q >> 2).padStart(2, "0")}:${String((q % 4) * 15).padStart(2, "0")}`;
 }

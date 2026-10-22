@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { parseDuration as p, fmtHours, monthGrid, weekStart, iso, totals, earnings, durationFromTimes, weekdaysInMonth, weekWorkdaysInMonth, remoteShare, holidayWorkdays } from "./web/lib.js";
+import { parseDuration as p, fmtHours, monthGrid, weekStart, iso, totals, earnings, durationFromTimes, weekdaysInMonth, weekWorkdaysInMonth, remoteShare, daysOff, normalizeTime, nextQuarter } from "./web/lib.js";
 
 assert.equal(p("2"), 2);
 assert.equal(p("1.5"), 1.5);
@@ -57,22 +57,31 @@ assert.equal(remoteShare([{ date: "2026-09-21", hours: 2 }], "2026-09-21", "2026
 assert.equal(durationFromTimes("09:00", "11:30"), 2.5);
 assert.equal(durationFromTimes("10:00", "09:00"), null);
 assert.equal(weekdaysInMonth(new Date(2026, 8, 1)), 22);
-assert.equal(
-  holidayWorkdays(
-    [
-      { date: "2026-09-15", leaveType: "holiday", hours: 4 },
-      { date: "2026-09-15", leaveType: "holiday", hours: 4 }, // same day counts once
-      { date: "2026-09-19", leaveType: "holiday", hours: 8 }, // Saturday: not a workday
-      { date: "2026-09-16", leaveType: "sick", hours: 8 },
-      { date: "2026-10-01", leaveType: "holiday", hours: 8 }, // other month
-    ],
-    "2026-09-01",
-    "2026-10-01",
-  ),
-  1,
+assert.deepEqual(
+  [
+    ...daysOff(
+      [
+        { date: "2026-09-15", leaveType: "holiday", hours: 0 },
+        { date: "2026-09-15", leaveType: "holiday", hours: 0 }, // same day counts once
+        { date: "2026-09-19", leaveType: "vacation", hours: 0 }, // Saturday: not a workday
+        { date: "2026-09-16", leaveType: "sick", hours: 8 }, // old sick entry with hours: still a whole day
+        { date: "2026-09-17", leaveType: "vacation", hours: 0 },
+        { date: "2026-09-18", leaveType: "other", hours: 4 }, // other leave has hours, not a day off
+        { date: "2026-10-01", leaveType: "holiday", hours: 0 }, // other month
+      ],
+      "2026-09-01",
+      "2026-10-01",
+    ),
+  ],
+  [["2026-09-15", "holiday"], ["2026-09-16", "sick"], ["2026-09-17", "vacation"]],
 );
 assert.equal(weekWorkdaysInMonth(new Date(2026, 8, 21), new Date(2026, 8, 24)), 5);
 assert.equal(weekWorkdaysInMonth(new Date(2026, 8, 28), new Date(2026, 9, 1)), 2); // Oct 1 and 2 only
 assert.equal(weekWorkdaysInMonth(new Date(2026, 8, 28), new Date(2026, 8, 29)), 3); // Sep 28 to 30
+
+for (const [i, o] of [["9", "09:00"], ["930", "09:30"], ["9:30", "09:30"], ["17.15", "17:15"], ["1230", "12:30"], ["24", null], ["9:75", null], ["abc", null], ["", null]]) assert.equal(normalizeTime(i), o, i);
+assert.equal(nextQuarter(new Date(2026, 9, 22, 16, 13)), "16:15");
+assert.equal(nextQuarter(new Date(2026, 9, 22, 16, 15)), "16:15");
+assert.equal(nextQuarter(new Date(2026, 9, 22, 23, 58)), "23:45");
 
 console.log("ok");

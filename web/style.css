@@ -49,7 +49,6 @@ main { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bo
 .btn:hover { border-color: var(--muted); }
 .btn.primary { background: var(--ink); border-color: var(--ink); color: var(--surface); }
 .btn.ghost { background: transparent; }
-.btn.small { padding: 5px 12px; font-size: 13px; }
 .icon-btn {
   flex: none;
   width: 34px;
@@ -90,6 +89,8 @@ main { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bo
 .figure { grid-area: figure; display: flex; align-items: baseline; gap: 10px; margin: 8px 0 0; }
 .big { font: 600 60px/0.95 var(--display); letter-spacing: -0.01em; }
 .of { color: var(--muted); font-size: 15px; }
+/* Unbilled time: a quiet side note at the end of the legend, never a headline. */
+.legend .extra { margin-left: auto; padding: 0 9px; border: 1px dashed color-mix(in srgb, var(--muted) 45%, transparent); border-radius: 999px; color: var(--muted); font-size: 12px; }
 .stats { grid-area: stats; display: flex; justify-content: flex-end; gap: 28px; padding-bottom: 3px; }
 .stat { display: grid; }
 .stat b { font: 600 22px/1.1 var(--display); white-space: nowrap; }
@@ -104,6 +105,8 @@ main { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bo
 .fill { display: flex; height: 100%; border-radius: 3px; overflow: hidden; background: var(--sunk); box-shadow: inset 0 0 0 1px var(--line); }
 .fill span { background: var(--c); }
 .fill span + span { border-left: 2px solid var(--surface); }
+/* Leave fills the bar with a stripe in its color, so it never reads as client work. */
+.fill .leave { background: repeating-linear-gradient(135deg, var(--c) 0 3px, color-mix(in srgb, var(--c) 40%, var(--surface)) 3px 6px); }
 .tick { position: absolute; top: -5px; bottom: -5px; width: 2px; margin-left: -1px; background: var(--hand); border-radius: 1px; }
 .legend { grid-area: legend; display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 12px 0 0; padding: 0; list-style: none; font-size: 14px; }
 .legend li { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
@@ -151,7 +154,8 @@ main { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bo
 .day:hover { box-shadow: inset 0 0 0 2px var(--line); }
 .day.out { color: var(--muted); }
 .day.out .pills { opacity: 0.55; }
-.day-top { display: flex; align-items: center; justify-content: space-between; }
+.day-top { display: flex; align-items: center; gap: 6px; }
+.sum { margin-left: auto; }
 .num { display: grid; place-items: center; width: 26px; height: 26px; margin: -3px 0 0 -3px; border-radius: 50%; font-weight: 600; }
 .day.today .num { background: var(--hand); color: #fff; }
 .sum { font-size: 13px; font-weight: 600; }
@@ -167,6 +171,16 @@ main { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bo
 }
 .pill i { flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--c); }
 .pill .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Unbilled work: outline only, so it reads as extra time. */
+.pill.unbilled { background: none; outline: 1px dashed color-mix(in srgb, var(--c) 60%, transparent); outline-offset: -1px; color: var(--muted); }
+/* A day off (sick, holiday, vacation) fills the whole cell with a soft stripe in its color. Work on that day sits on top. */
+.day.off { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--off) 13%, var(--surface)) 0 6px, color-mix(in srgb, var(--off) 6%, var(--surface)) 6px 12px); }
+.day.off .pill { background: color-mix(in srgb, var(--c) 16%, var(--surface)); }
+.day.off .pill.unbilled { background: var(--surface); }
+.off-tag { display: inline-flex; align-items: center; gap: 4px; min-width: 0; font-size: 12px; font-weight: 600; color: color-mix(in srgb, var(--off) 70%, var(--ink)); }
+.off-tag .ico { width: 13px; height: 13px; stroke-width: 2.2; }
+.off-tag span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.day.tiny .off-tag span { display: none; }
 .more { font-size: 12px; color: var(--muted); padding-left: 6px; }
 /* Leave is gray and hatched, so it never reads as client work. */
 .pill.leave {
@@ -181,6 +195,7 @@ main { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bo
 .wk { display: flex; flex-direction: column; min-height: 0; overflow: hidden; padding: 6px 10px; background: var(--sunk); font-size: 12px; line-height: 1.22; color: var(--muted); white-space: nowrap; }
 .wk b { margin-bottom: 1px; font: 600 18px/1.1 var(--display); color: var(--ink); }
 .wk-zero b { color: var(--muted); font-weight: 500; }
+.wk-extra { align-self: flex-start; margin-top: 2px; padding: 0 6px; border: 1px dashed color-mix(in srgb, var(--muted) 45%, transparent); border-radius: 999px; }
 
 /* Drawer */
 .scrim { position: fixed; inset: 0; z-index: 10; background: rgb(10 12 18 / 0.35); }
@@ -212,6 +227,7 @@ main { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bo
 .lead .ico { width: 18px; height: 18px; stroke-width: 2; }
 .who { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
 .kind { display: inline-grid; color: var(--muted); }
+.tag { padding: 0 7px; border: 1px dashed var(--line); border-radius: 999px; color: var(--muted); font-size: 12px; }
 .entry {
   flex: 1;
   display: grid;
@@ -256,8 +272,12 @@ main { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bo
 .seg span:hover { color: var(--ink); }
 .seg input:checked + span { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: 0 0 0 1px var(--line); }
 .seg input:focus-visible + span { outline: 2px solid var(--hand); outline-offset: 1px; }
-.hours-row { display: flex; gap: 8px; align-items: center; }
-.hours-row input { flex: 1; }
+/* Hours box, quick picks and the Billable / Unbilled switch share one row of equal height. */
+.hours-row { display: flex; gap: 8px; align-items: stretch; }
+.seg.bill { padding: 2px; border-radius: 8px; }
+.seg.bill label { display: flex; }
+.seg.bill span { padding: 0 8px; border-radius: 6px; }
+.hours-row input { flex: 1; min-width: 64px; }
 .quick { display: flex; gap: 4px; }
 .q { padding: 9px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 13px; font-weight: 600; }
 .q:hover { border-color: var(--muted); }
@@ -285,12 +305,31 @@ main { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bo
   text-underline-offset: 3px;
 }
 .err { min-height: 1.3em; margin: 0 0 10px; color: var(--hand); font-size: 14px; }
-.form-actions { display: flex; gap: 8px; }
+.err:empty { min-height: 0; margin: 0; }
+.form-actions { display: flex; gap: 8px; margin-top: 2px; }
+/* Small gray label above a group, the same as the Hours and Note labels. */
+.lbl { display: block; flex-basis: 100%; margin: 0 0 6px; padding: 0; font-size: 13px; font-weight: 500; color: var(--muted); }
+.seg-row .lbl { margin-bottom: -4px; }
+/* Time picker */
+.tp { position: relative; }
+.tlist { position: absolute; top: 100%; left: 0; right: 0; z-index: 5; display: grid; max-height: 232px; overflow-y: auto; margin-top: 4px; padding: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 10px 28px rgb(10 12 18 / 0.12); }
+.tlist button { display: flex; justify-content: space-between; padding: 7px 10px; border: 0; border-radius: 7px; background: none; color: var(--ink); font-size: 14px; font-weight: 500; text-align: left; }
+.tlist button:hover { background: var(--sunk); }
+.tlist button[aria-selected="true"] { background: var(--bg); font-weight: 600; box-shadow: inset 0 0 0 1px var(--line); }
+.tlist small { color: var(--muted); font-size: 13px; }
 
 /* Clients */
 .clients { list-style: none; margin: 0 0 18px; padding: 0; display: grid; gap: 10px; }
-.client-row { display: grid; grid-template-columns: 30px 1fr 76px 74px 84px; gap: 8px; align-items: center; }
+/* Every box in a row has the height of the button. */
+.client-row { display: grid; grid-template-columns: 30px 1fr 76px 84px auto; gap: 8px; align-items: stretch; }
 .client-row input, .client-row select { padding: 8px 10px; font-size: 14px; }
+.client-row .swatch { align-self: center; }
+/* Own arrow, so it keeps a fixed gap from the box edge in every browser. */
+.client-row select {
+  appearance: none;
+  padding-right: 30px;
+  background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235f6878' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E") no-repeat right 9px center / 16px;
+}
 .client-row.archived > :not(.btn) { opacity: 0.55; }
 .swatch {
   width: 30px;
@@ -341,7 +380,8 @@ main { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bo
   .wk, .wkh { display: none; }
   .day { padding: 6px; }
   .pill { padding: 3px; }
-  .pill .name, .pill b, .sum { display: none; }
+  .pill .name, .pill b, .sum, .off-tag span { display: none; }
+  .pills { flex-direction: row; flex-wrap: wrap; }
   .client-row { grid-template-columns: 30px 1fr 70px; }
 }
 @media (prefers-reduced-motion: reduce) {

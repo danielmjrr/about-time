@@ -5,9 +5,11 @@ A small time tracker for client work. It runs on your Mac and opens in your brow
 ## Features
 
 - A month calendar. Click a day to log time for a client.
-- Enter hours as `2h`, `1:30`, `90m` or `1.5`, or enter a start time and an end time.
+- Enter hours as `2h`, `1:30`, `90m` or `1.5`, or pick a start time and an end time. The start is 09:00 and the end is the next quarter hour by default.
 - Mark each entry as work or a meeting, and as remote or in-office.
-- Log leave: sick, holiday, vacation or other. A holiday removes that workday from the target.
+- Next to Hours, pick **Unbilled** for extra work that you do not bill. **Billable** is the default. Unbilled time shows on the calendar with a dashed outline, and as a small "+h:mm unbilled" note in the totals. It does not count toward hours, the target or earnings.
+- Log leave: sick, holiday (a public holiday), vacation or other. Sick, holiday and vacation take the whole day: the calendar fills the day with a colored stripe. Work you log on that day still shows and counts. A holiday is not a workday.
+- The target is one man-day for each workday. A public holiday comes off the target. Sick, vacation and other leave stay in the target and fill the bar with a striped part.
 - Totals for the week and the month: hours against a target, man-days, earnings for each currency, and the remote share.
 - An hourly rate and a currency for each client. Archive a client to hide it but keep its hours.
 
