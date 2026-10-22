@@ -2,7 +2,7 @@
 
 A free and open source billable-hours tracker for contractors, with multi-client support. It runs locally on macOS and opens in your browser. Your data stays on your computer in one JSON file, with no account and no cloud.
 
-![About Time with sample data: week and month totals above a month calendar of logged hours](docs/screenshot.png)
+![About Time with sample data: week and month totals above a month calendar of logged hours](docs/about-time.png)
 
 ## Features
 
