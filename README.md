@@ -1,6 +1,8 @@
 # About Time
 
-A small time tracker for client work. It runs on your Mac and opens in your browser. Your data stays on your Mac in one JSON file.
+A free and open source billable-hours tracker for contractors, with multi-client support. It runs locally on macOS and opens in your browser. Your data stays on your computer in one JSON file, with no account and no cloud.
+
+![About Time with sample data: week and month totals above a month calendar of logged hours](docs/screenshot.png)
 
 ## Features
 
@@ -43,3 +45,7 @@ To use it without the Dock app, run `python3 server.py`, then open `http://local
 - After you edit `server.py` or `web/`, run `./make-app.sh` again. The Dock app uses its own copy of these files.
 - After you move this folder, run `./make-app.sh`, then add `About Time.app` to the Dock again.
 - To stop the server, run `pkill -f "About Time.app/Contents/Resources/server.py"`.
+
+## License
+
+[MIT](LICENSE)
