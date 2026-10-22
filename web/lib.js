@@ -70,12 +70,12 @@ export function remoteShare(entries, from, to) {
   return all ? Math.round((remote / all) * 100) : null;
 }
 
-// Hours x rate, summed per currency. Clients without a rate earn nothing.
+// Hours x rate, summed. All rates use one currency. Clients without a rate earn nothing.
 export function earnings(rows, clients) {
-  const out = {};
+  let out = 0;
   for (const r of rows) {
     const c = clients.find((c) => c.id === r.clientId);
-    if (c?.rate) out[c.currency] = (out[c.currency] || 0) + r.hours * c.rate;
+    if (c?.rate) out += r.hours * c.rate;
   }
   return out;
 }

@@ -4,12 +4,12 @@ import {
 } from "./lib.js";
 
 const PRESETS = ["#2F6FED", "#12A594", "#7C5CFF", "#E5A00D", "#D6457A", "#3AA55A", "#0EA5E9", "#F06B2C", "#9A6B3F", "#64748B"];
-const CURRENCIES = ["AUD", "CAD", "CHF", "CNY", "CZK", "DKK", "EUR", "GBP", "HUF", "INR", "JPY", "NOK", "NZD", "PLN", "SEK", "USD"];
+const CURRENCIES = Intl.supportedValuesOf("currency"); // every ISO 4217 code the browser knows
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const fmtDate = (d, opts) => new Intl.DateTimeFormat(undefined, opts).format(d);
-const money = (n, cur) => new Intl.NumberFormat(undefined, { style: "currency", currency: cur, maximumFractionDigits: 0 }).format(n);
+const money = (n) => new Intl.NumberFormat(undefined, { style: "currency", currency: currency(), maximumFractionDigits: 0 }).format(n);
 // Leave is stored as an entry with this pseudo client. It never counts toward work totals or targets.
 const LEAVE = { id: "leave", name: "On Leave", color: "#8a93a6" };
 const isWork = (e) => e.clientId !== LEAVE.id;
@@ -61,6 +61,8 @@ function freshForm() {
 }
 
 const hoursPerDay = () => db.settings.hoursPerDay || 8;
+// One currency for all rates. Older data kept a currency on each client: the first one is the default.
+const currency = () => db.settings.currency || db.clients.find((c) => c.currency)?.currency || "USD";
 const manDays = (h) => Math.round((h / hoursPerDay()) * 10) / 10;
 // Target = one man-day for every workday: Monday to Friday, except public holidays.
 // Sick, vacation and other leave stay in the target and fill the bar as leave. A week counts only its days in the month d.
@@ -133,11 +135,11 @@ function period(title, sub, from, to, target, noun) {
   const leave = leaveRows(iso(from), iso(to));
   const leaveSum = leave.reduce((a, r) => a + r.hours, 0);
   const remote = remoteShare(db.entries.filter(isWork), iso(from), iso(to));
-  const earn = Object.entries(earnings(t.rows, db.clients));
+  const earn = earnings(t.rows, db.clients);
   const scale = Math.max(target, t.sum + leaveSum) || 1;
   const amount = (r) => {
     const c = client(r.clientId);
-    return c.rate ? money(r.hours * c.rate, c.currency) : "";
+    return c.rate ? money(r.hours * c.rate) : "";
   };
   const stat = (value, label) => `<div class="stat"><b>${value}</b><span>${label}</span></div>`;
   const legend = [
@@ -148,7 +150,7 @@ function period(title, sub, from, to, target, noun) {
     <header class="p-head"><h2>${title}</h2><span class="range">${sub}</span></header>
     <p class="figure"><span class="big">${fmtHours(t.sum)}</span>${target ? `<span class="of">of ${fmtHours(target)}</span>` : ""}</p>
     <div class="stats">
-      ${earn.length ? stat(earn.map(([cur, n]) => money(n, cur)).join(" + "), "earned") : ""}
+      ${earn ? stat(money(earn), "earned") : ""}
       ${stat(manDays(t.sum).toLocaleString(), manDays(t.sum) === 1 ? "man-day" : "man-days")}
       ${remote != null ? stat(`${remote}%`, "remote") : ""}
     </div>
@@ -215,13 +217,13 @@ function weekCell(week, sum, byDay) {
   const work = week.flatMap((d) => (byDay.get(iso(d)) || []).filter(isWork));
   const t = totals(work.filter(isBilled), iso(week[0]), iso(addDays(week[6], 1)));
   const unbilled = work.filter(isUnbilled).reduce((a, e) => a + e.hours, 0);
-  const earn = Object.entries(earnings(t.rows, db.clients));
+  const earn = earnings(t.rows, db.clients);
   const remote = remoteShare(work, iso(week[0]), iso(addDays(week[6], 1)));
   return `<div class="wk ${sum ? "" : "wk-zero"}">
     <b>${fmtHours(sum)}</b>
     ${target ? `<span>of ${fmtHours(target)}</span>` : ""}
     <span>${manDays(sum).toLocaleString()} MD</span>
-    ${earn.map(([cur, n]) => `<span>${money(n, cur)}</span>`).join("")}
+    ${earn ? `<span>${money(earn)}</span>` : ""}
     ${remote != null ? `<span>${remote}% remote</span>` : ""}
     ${unbilled ? `<span class="wk-extra" title="${fmtHours(unbilled)} unbilled. Not in the totals.">+${fmtHours(unbilled)}<span class="sr"> unbilled</span></span>` : ""}
   </div>`;
@@ -335,7 +337,6 @@ function clientsHtml() {
       <button type="button" class="swatch" style="--c:${c.color}" data-act="palette" aria-label="Change color for ${esc(c.name)}" aria-expanded="${openPalette === c.id}"></button>
       <input data-field="name" value="${esc(c.name)}" aria-label="Client name">
       <input data-field="rate" inputmode="decimal" value="${c.rate ?? ""}" placeholder="Rate" aria-label="Hourly rate for ${esc(c.name)}">
-      <select data-field="currency" aria-label="Currency for ${esc(c.name)}">${CURRENCIES.map((x) => `<option ${x === c.currency ? "selected" : ""}>${x}</option>`).join("")}</select>
       ${used.has(c.id)
         ? `<button type="button" class="btn" data-act="${c.archived ? "restore" : "archive"}">${c.archived ? "Restore" : "Archive"}</button>`
         : `<button type="button" class="btn" data-act="deleteClient">Delete</button>`}
@@ -358,6 +359,8 @@ function clientsHtml() {
       <button class="btn primary">Add client</button>
     </form>
     ${archived.length ? `<h3>Archived</h3><p class="hint" style="margin-bottom:10px">Hidden when you log time. Their hours still count in totals.</p><ul class="clients">${archived.map(row).join("")}</ul>` : ""}
+    <h3>Currency</h3>
+    <div class="target field"><select id="currency" aria-label="Currency">${CURRENCIES.map((x) => `<option ${x === currency() ? "selected" : ""}>${x}</option>`).join("")}</select><span>for all rates and earnings</span></div>
     <h3>Targets</h3>
     <div class="target field"><input id="hoursPerDay" inputmode="decimal" value="${hoursPerDay()}" aria-label="Hours in one man-day"><span>hours in one man-day</span></div>
     <p class="hint">The target is one man-day for each workday. Workdays are Monday to Friday, except public holidays: ${fmtHours(monthTarget(view))} in ${fmtDate(view, { month: "long" })}.</p>`;
@@ -497,7 +500,6 @@ function addClient() {
     name,
     color: PRESETS.find((p) => !used.has(p)) || PRESETS[db.clients.length % PRESETS.length],
     rate: null,
-    currency: db.clients.at(-1)?.currency || "USD",
     archived: false,
   });
   persist();
@@ -614,6 +616,11 @@ document.addEventListener("change", (ev) => {
     $("#billOpts").hidden = leave;
     $("#timeBlock").hidden = leave && FULL_DAY.includes($("#entryForm input[name=leaveType]:checked")?.value);
     return;
+  }
+  if (t.id === "currency") {
+    db.settings.currency = t.value;
+    persist();
+    return render();
   }
   if (t.id === "hoursPerDay") {
     const n = parseFloat(t.value.replace(",", "."));

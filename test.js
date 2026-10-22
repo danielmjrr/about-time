@@ -37,12 +37,12 @@ assert.deepEqual(
   earnings(
     [{ clientId: "a", hours: 2 }, { clientId: "b", hours: 3 }, { clientId: "c", hours: 1 }],
     [
-      { id: "a", rate: 100, currency: "EUR" },
-      { id: "b", rate: 50, currency: "USD" },
-      { id: "c", rate: null, currency: "EUR" },
+      { id: "a", rate: 100 },
+      { id: "b", rate: 50 },
+      { id: "c", rate: null },
     ],
   ),
-  { EUR: 200, USD: 150 },
+  350,
 );
 
 const located = [

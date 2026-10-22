@@ -12,8 +12,8 @@ A free and open source billable-hours tracker for contractors, with multi-client
 - Next to Hours, pick **Unbilled** for extra work that you do not bill. **Billable** is the default. Unbilled time shows on the calendar with a dashed outline, and as a small "+h:mm unbilled" note in the totals. It does not count toward hours, the target or earnings.
 - Log leave: sick, holiday (a public holiday), vacation or other. Sick, holiday and vacation take the whole day: the calendar fills the day with a colored stripe. Work you log on that day still shows and counts. A holiday is not a workday.
 - The target is one man-day for each workday. A public holiday comes off the target. Sick, vacation and other leave stay in the target and fill the bar with a striped part.
-- Totals for the week and the month: hours against a target, man-days, earnings for each currency, and the remote share.
-- An hourly rate and a currency for each client. Archive a client to hide it but keep its hours.
+- Totals for the week and the month: hours against a target, man-days, earnings and the remote share.
+- An hourly rate for each client, and one currency for all rates. All currencies are supported: the list holds every ISO 4217 code that your browser knows. Archive a client to hide it but keep its hours.
 
 ## Requirements
 

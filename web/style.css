@@ -283,7 +283,7 @@ main { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bo
 .q:hover { border-color: var(--muted); }
 .pill .ico { width: 12px; height: 12px; color: var(--c); stroke-width: 2.4; }
 .field { display: grid; gap: 6px; margin-bottom: 14px; font-size: 13px; font-weight: 500; color: var(--muted); }
-.field input, .add-client input, .client-row input, .client-row select {
+.field input, .field select, .add-client input, .client-row input {
   width: 100%;
   min-width: 0;
   padding: 10px 12px;
@@ -293,7 +293,7 @@ main { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bo
   color: var(--ink);
   font-size: 15px;
 }
-.field input:focus, .add-client input:focus, .client-row input:focus, .client-row select:focus { border-color: var(--muted); outline: none; }
+.field input:focus, .field select:focus, .add-client input:focus, .client-row input:focus { border-color: var(--muted); outline: none; }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .link {
   margin: -4px 0 14px;
@@ -321,11 +321,11 @@ main { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bo
 /* Clients */
 .clients { list-style: none; margin: 0 0 18px; padding: 0; display: grid; gap: 10px; }
 /* Every box in a row has the height of the button. */
-.client-row { display: grid; grid-template-columns: 30px 1fr 76px 84px auto; gap: 8px; align-items: stretch; }
-.client-row input, .client-row select { padding: 8px 10px; font-size: 14px; }
+.client-row { display: grid; grid-template-columns: 30px 1fr 76px auto; gap: 8px; align-items: stretch; }
+.client-row input { padding: 8px 10px; font-size: 14px; }
 .client-row .swatch { align-self: center; }
 /* Own arrow, so it keeps a fixed gap from the box edge in every browser. */
-.client-row select {
+.field select {
   appearance: none;
   padding-right: 30px;
   background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235f6878' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E") no-repeat right 9px center / 16px;
