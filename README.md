@@ -45,6 +45,7 @@ To use it without the Dock app, run `python3 server.py`, then open `http://local
 - After you edit `server.py` or `web/`, run `./make-app.sh` again. The Dock app uses its own copy of these files.
 - After you move this folder, run `./make-app.sh`, then add `About Time.app` to the Dock again.
 - To stop the server, run `pkill -f "About Time.app/Contents/Resources/server.py"`.
+- To release a version, change `version` in `package.json`. Then tag the commit as `vX.Y.Z` and publish a GitHub release for that tag.
 
 ## License
 

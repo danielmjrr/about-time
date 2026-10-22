@@ -3,6 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 APP="About Time.app"
+VERSION="$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' package.json)"
 TMP="$(mktemp -d)"
 
 rm -rf "$APP"
@@ -22,7 +23,7 @@ cp -R web "$APP/Contents/Resources/web"
 
 cp app/launch.sh "$APP/Contents/MacOS/about-time"
 chmod +x "$APP/Contents/MacOS/about-time"
-cat > "$APP/Contents/Info.plist" <<'PLIST'
+cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -33,7 +34,7 @@ cat > "$APP/Contents/Info.plist" <<'PLIST'
   <key>CFBundleExecutable</key><string>about-time</string>
   <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundlePackageType</key><string>APPL</string>
-  <key>CFBundleShortVersionString</key><string>1.0</string>
+  <key>CFBundleShortVersionString</key><string>$VERSION</string>
   <key>LSUIElement</key><true/>
 </dict>
 </plist>

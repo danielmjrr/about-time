@@ -1,0 +1,37 @@
+name: Bug report
+description: Something in About Time does not work as it must.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: Tell us what you saw. Add a screenshot if it helps.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Click a day in the calendar.
+        2. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: About Time version
+      description: The version is in package.json, or in the Finder under Get Info on About Time.app.
+      placeholder: 1.0.0
+  - type: input
+    id: env
+    attributes:
+      label: macOS and browser
+      placeholder: macOS 15.1, Safari 18
